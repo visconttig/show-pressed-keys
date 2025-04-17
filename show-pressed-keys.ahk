@@ -1,3 +1,14 @@
+IniFile := A_ScriptDir . "\GuiSettings.ini"
+
+global Dragging := false, IniFile := SubStr(A_ScriptFullPath, 1, -4) ".ini"
+
+; Place this near the top of your script
+IniRead, GuiPosition, %IniFile%, Settings, GuiPosition, Fixed Position
+IniRead, FixedX, %IniFile%, Settings, FixedX, 100
+IniRead, FixedY, %IniFile%, Settings, FixedY, 100
+
+
+
 ; this should be at the ***top*** level
 GroupAdd, programming_tools, ahk_exe Code.exe
 GroupAdd, programming_tools, ahk_exe idea64.exe
@@ -7,6 +18,7 @@ GroupAdd, programming_tools, ahk_pid 4784 ; vscode
 #SingleInstance
 #Persistent
 #IfWinNotActive ahk_group programming_tools
+
 
 
 ; Force a Settings reset
@@ -19,9 +31,6 @@ Gui, Destroy
 ;put this line near the top of your script:
     FileCreateShortcut, %A_ScriptFullPath%, %A_Startup%\%A_ScriptName%.lnk, %A_ScriptDir% 
 ;=============================================
-
-	
-	; KeypressOSD v2.53 (2022-03-17)
 	
 	#NoEnv
 	#SingleInstance force
@@ -68,9 +77,56 @@ Gui, Destroy
 		Gui, Color, %BkColor%
 		Gui, Font, c%FontColor% %FontStyle% s%FontSize%, %FontName%
 		Gui, Add, Text, vHotkeyText Center y20
+		; Respond to mouse dragging
+		Gui, Add, Text, x0 y0 w%GuiWidth% h%GuiHeight% hwndDragHwnd
+DllCall("SetWindowLong", "Ptr", DragHwnd, "Int", -16, "Int", 0x50000000) ; WS_VISIBLE|WS_CHILD
 		
 		WinSet, Transparent, %TransN%
+
+		; Show the GUI at the correct position
+		if (GuiPosition = "Fixed Position") {
+			gui_x := FixedX
+			gui_y := FixedY
+		} else {
+			gui_x := A_ScreenWidth - 300
+			gui_y := A_ScreenHeight - 300
+		}
+		Gui, Show, x%gui_x% y%gui_y% NoActivate
+
 	}
+
+;; Enable dragging {{{
+	~LButton::
+if (WinActive("ahk_id " hGui_OSD)) {
+    MouseGetPos, startX, startY
+    WinGetPos, guiX, guiY,,, ahk_id %hGui_OSD%
+    Dragging := true
+    SetTimer, DragMove, 10
+}
+return
+
+~LButton Up::
+if (Dragging) {
+    Dragging := false
+    SetTimer, DragMove, Off
+    WinGetPos, guiX, guiY,,, ahk_id %hGui_OSD%
+    IniWrite, %guiX%, %IniFile%, GuiPos, FixedX
+    IniWrite, %guiY%, %IniFile%, GuiPos, FixedY
+    IniWrite, Fixed Position, %IniFile%, Settings, GuiPosition
+}
+return
+
+DragMove:
+    if (!Dragging)
+        return
+    MouseGetPos, curX, curY
+    dx := curX - startX
+    dy := curY - startY
+    newX := guiX + dx
+    newY := guiY + dy
+    Gui, Show, x%newX% y%newY% NoActivate
+return
+; }}}
 	
 
 	CreateHotkey() {
@@ -310,51 +366,32 @@ Gui, Destroy
 		IniRead, DisplaySec           , %IniFile%, Settings, DisplaySec           , 2
 		IniRead, GuiPosition          , %IniFile%, Settings, GuiPosition          , Bottom 
 		;Top 
+		; Read saved dragging position
+		IniRead, FixedX, %IniFile%, GuiPos, FixedX, 300
+		IniRead, FixedY, %IniFile%, GuiPos, FixedY, 300
+
 		IniRead, FontSize             , %IniFile%, Settings, FontSize             , 28
-		;50
 		IniRead, GuiWidth             , %IniFile%, Settings, GuiWidth             , 500 ;1000 ;%A_ScreenWidth%
 		IniRead, GuiHeight            , %IniFile%, Settings, GuiHeight            , 65
-		; 85
-		; 115
 		IniRead, BkColor              , %IniFile%, Settings, BkColor              , Black
 		IniRead, FontColor            , %IniFile%, Settings, FontColor            , White
 		IniRead, FontStyle            , %IniFile%, Settings, FontStyle            , w700
 		IniRead, FontName             , %IniFile%, Settings, FontName             , Arial
 		IniRead, AutoGuiW             , %IniFile%, Settings, AutoGuiW             , 0
-		; 1
 		IniRead, Bottom_Win           , %IniFile%, Settings, Bottom_Win           , 0
-		; 1
 		IniRead, Bottom_Screen        , %IniFile%, Settings, Bottom_Screen        , 1
-		; 0
-		IniRead, Bottom_OffsetX       , %IniFile%, Settings, Bottom_OffsetX       , 1425
-		; 0
-		;250
-		; 700
-		; 0
-		IniRead, Bottom_OffsetY       , %IniFile%, Settings, Bottom_OffsetY       , 825
-		; 125 
-		;;;;; 250
-		; 0
-		; 50
+		IniRead, Bottom_OffsetX       , %IniFile%, Settings, Bottom_OffsetX       , 0
+		IniRead, Bottom_OffsetY       , %IniFile%, Settings, Bottom_OffsetY       , 0
 		IniRead, Top_Win              , %IniFile%, Settings, Top_Win              , 0
-		; 1***
 		IniRead, Top_Screen           , %IniFile%, Settings, Top_Screen           , 0
-		; 0
 		IniRead, Top_OffsetX          , %IniFile%, Settings, Top_OffsetX          , 0
-		; 125
-		;0
 		IniRead, Top_OffsetY          , %IniFile%, Settings, Top_OffsetY          , 0
-		; 750
-		; 145
-		; 125
-		;0
-		IniRead, FixedX               , %IniFile%, Settings, FixedX               , 0
-		;100
-		IniRead, FixedY               , %IniFile%, Settings, FixedY               , 0
-		;700
-		; 0
-		; 750
-		; 200
+
+		; For fixed position
+		IniRead, GuiPosition, %IniFile%, Settings, GuiPosition, Fixed Position
+		IniRead, FixedX     , %IniFile%, Settings, FixedX     , 1425
+		IniRead, FixedY     , %IniFile%, Settings, FixedY     , 225
+
 	}
 	
 	SaveSettings() {
@@ -819,8 +856,23 @@ Gui, Destroy
 		SetFormat, Integer, % $_FormatInteger
 		Return, Result
 	}
+
 	
 
 F1::
 Suspend, Toggle
+return
+
+; Save the current postition
+^!s::  ; Ctrl + Alt + S
+    WinGetPos, curX, curY,,, A
+	IniWrite, Fixed Position, %IniFile%, Settings, GuiPosition
+    IniWrite, %curX%, %IniFile%, Settings, FixedX
+    IniWrite, %curY%, %IniFile%, Settings, FixedY
+    ToolTip, Saved X:%curX% Y:%curY%
+    SetTimer, RemoveTooltip, -1000
+return
+
+RemoveTooltip:
+    ToolTip
 return
