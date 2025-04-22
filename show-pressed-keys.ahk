@@ -312,24 +312,24 @@ ReadSettings() {
 	IniRead, ShowStickyModKeyCount, %IniFile%, Settings, ShowStickyModKeyCount, 0
 	IniRead, DisplaySec           , %IniFile%, Settings, DisplaySec           , 2
 	IniRead, GuiPosition          , %IniFile%, Settings, GuiPosition          , Fixed ;Bottom
-	IniRead, FontSize             , %IniFile%, Settings, FontSize             , 28 ;14 ; 50 ;28
+	IniRead, FontSize             , %IniFile%, Settings, FontSize             , 28 
 	IniRead, GuiWidth             , %IniFile%, Settings, GuiWidth             , 775 ;200 ; 500 ;%A_ScreenWidth% ;500
 	IniRead, GuiHeight            , %IniFile%, Settings, GuiHeight            , 42 ;26 ;65 ;115 ;65
 	IniRead, BkColor              , %IniFile%, Settings, BkColor              , Black
 	IniRead, FontColor            , %IniFile%, Settings, FontColor            , White
 	IniRead, FontStyle            , %IniFile%, Settings, FontStyle            , w700
 	IniRead, FontName             , %IniFile%, Settings, FontName             , Arial
-	IniRead, AutoGuiW             , %IniFile%, Settings, AutoGuiW             , 0 ;1
-	IniRead, Bottom_Win           , %IniFile%, Settings, Bottom_Win           , 0 ;1
+	IniRead, AutoGuiW             , %IniFile%, Settings, AutoGuiW             , 0 
+	IniRead, Bottom_Win           , %IniFile%, Settings, Bottom_Win           , 0 
 	IniRead, Bottom_Screen        , %IniFile%, Settings, Bottom_Screen        , 0
 	IniRead, Bottom_OffsetX       , %IniFile%, Settings, Bottom_OffsetX       , 0
-	IniRead, Bottom_OffsetY       , %IniFile%, Settings, Bottom_OffsetY       , 0 ; 50
-	IniRead, Top_Win              , %IniFile%, Settings, Top_Win              , 0 ;1
+	IniRead, Bottom_OffsetY       , %IniFile%, Settings, Bottom_OffsetY       , 0 
+	IniRead, Top_Win              , %IniFile%, Settings, Top_Win              , 0 
 	IniRead, Top_Screen           , %IniFile%, Settings, Top_Screen           , 0
 	IniRead, Top_OffsetX          , %IniFile%, Settings, Top_OffsetX          , 0
 	IniRead, Top_OffsetY          , %IniFile%, Settings, Top_OffsetY          , 0
-	IniRead, FixedX               , %IniFile%, Settings, FixedX               , 725 ;125
-	IniRead, FixedY               , %IniFile%, Settings, FixedY               , 550 ;650
+	IniRead, FixedX               , %IniFile%, Settings, FixedX               , 0 ; use ini file !
+	IniRead, FixedY               , %IniFile%, Settings, FixedY               , 0
 
 } 
 
